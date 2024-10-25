@@ -1,12 +1,7 @@
-﻿using Azure.Core;
-using Entities.ViewModels.Products;
+﻿using Entities.ViewModels.Products;
 using MongoDB.Driver;
-using Nest;
 using Newtonsoft.Json;
-using System.Collections.Concurrent;
-using System.Reflection;
 using System.Text.RegularExpressions;
-using Utilities.Contants;
 using Utilities.Contants.ProductV2;
 
 namespace WEB.CMS.Models.Product

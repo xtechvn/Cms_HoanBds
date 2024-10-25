@@ -1,11 +1,8 @@
-﻿using Azure.Core;
-using Caching.Elasticsearch;
+﻿using Caching.Elasticsearch;
 using Entities.ViewModels;
 using Entities.ViewModels.Comment;
-using hoanbds_Service.ElasticSearch.NewEs;
 using Microsoft.AspNetCore.Mvc;
 using Repositories.IRepositories;
-using Repositories.Repositories;
 
 namespace WEB.CMS.Controllers
 {

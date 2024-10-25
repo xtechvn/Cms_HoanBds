@@ -1,19 +1,14 @@
-﻿using Azure.Core;
-using Caching.RedisWorker;
+﻿using Caching.RedisWorker;
 using Entities.Models;
 using Entities.ViewModels.Products;
 using hoanbds_Service.ElasticSearch.NewEs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Nest;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 using Utilities;
 using Utilities.Contants;
 using Utilities.Contants.ProductV2;
 using WEB.Adavigo.CMS.Service;
 using WEB.CMS.Customize;
-using WEB.CMS.Models;
 using WEB.CMS.Models.Product;
 
 namespace WEB.CMS.Controllers

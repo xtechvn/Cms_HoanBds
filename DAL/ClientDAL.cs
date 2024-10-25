@@ -9,12 +9,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Web.Helpers;
 using Utilities;
 using Utilities.Contants;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DAL
 {

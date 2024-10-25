@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Entities.ViewModels.Products;
+﻿using Entities.ViewModels.Products;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;

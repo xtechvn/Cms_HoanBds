@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using DAL.Generic;
+﻿using DAL.Generic;
 using DAL.StoreProcedure;
 using Entities.Models;
 using Entities.ViewModels;
@@ -10,7 +9,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Utilities;
 using Utilities.Contants;
