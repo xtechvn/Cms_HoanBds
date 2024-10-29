@@ -25,12 +25,10 @@ namespace WEB.Adavigo.CMS.Controllers.Configs
         private readonly IMenuRepository _MenuRepository;
         private readonly IConfiguration _configuration;
         private readonly RedisConn _redisService;
-        private APIService apiService;
         public MenuController(IConfiguration configuration, IUserRepository userRepository, IMenuRepository menuRepository, RedisConn redisService)
         {
             _configuration = configuration;
             _MenuRepository = menuRepository;
-            apiService = new APIService(configuration, userRepository);
             _redisService = redisService;
             _redisService.Connect();
 
@@ -211,23 +209,15 @@ namespace WEB.Adavigo.CMS.Controllers.Configs
         {
             try
             {
-                long _UserId = 0;
-
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
-                {
-                    _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-                }
-                int db_index = Convert.ToInt32(_configuration["Redis:Database:db_common"]);
+               
               
                 var lst_Notify = new NotifySummeryViewModel();
                               
-                    //lấy từ api
-                    var ListNotify = await apiService.GetListNotify(_UserId.ToString());
-                    lst_Notify = ListNotify;
+                 
                     return Ok(new
                     {
                         status = (int)ResponseType.SUCCESS,
-                        data = lst_Notify != null ? lst_Notify : null
+                        data = lst_Notify
                     });
             }
             catch (Exception ex)
@@ -246,20 +236,11 @@ namespace WEB.Adavigo.CMS.Controllers.Configs
         {
             try
             {
-                long _UserId = 0;
-
-                if (HttpContext.User.FindFirst(ClaimTypes.NameIdentifier) != null)
+                return Ok(new
                 {
-                    _UserId = Convert.ToInt64(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-                }
+                    status = (int)ResponseType.SUCCESS,
 
-                var UpdateNotify = await apiService.UpdateNotify(id, _UserId.ToString(), seen_status);
-                if (UpdateNotify == 0)
-                    return Ok(new
-                    {
-                        status = (int)ResponseType.SUCCESS,
-
-                    });
+                });
 
             }
             catch (Exception ex)
