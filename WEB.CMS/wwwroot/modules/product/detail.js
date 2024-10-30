@@ -666,7 +666,7 @@ var product_detail = {
         $('#group-product-selection').html('')
         $('#group-id input').attr('placeholder', 'Chọn ngành hàng')
         $('#group-id input').attr('data-id', '-1')
-        _product_function.POST('/Product/GroupProduct', { group_id: 1 }, function (result) {
+        _product_function.POST('/Product/GroupProduct', { group_id: 56 }, function (result) {
             if (result.is_success && result.data) {
                 $('#them-nganhhang .bg-box .row').html('')
                 var html = _product_constants.HTML.ProductDetail_GroupProduct_colmd4
