@@ -192,7 +192,8 @@ namespace WEB.CMS.Controllers
                             {
                                 { "store_name", "Sp_GetAllArticle" },
                                 { "index_es", "es_hoanbds_sp_get_article" },
-                                {"project_type", "Hulotoy" }
+                                {"project_type", Convert.ToInt16(ProjectType.HOANBDS) },
+                                {"id" , model.Id }
 
                             };
                     var _data_push = JsonConvert.SerializeObject(j_param);
@@ -256,7 +257,8 @@ namespace WEB.CMS.Controllers
                             {
                                 { "store_name", "Sp_GetAllArticle" },
                                 { "index_es", "es_hoanbds_sp_get_article" },
-                                {"project_type", "Hulotoy" }
+                                {"project_type", Convert.ToInt16(ProjectType.HOANBDS) },
+                                {"id" , Id }
 
                             };
                     var _data_push = JsonConvert.SerializeObject(j_param);
