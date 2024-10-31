@@ -666,7 +666,7 @@ var product_detail = {
         $('#group-product-selection').html('')
         $('#group-id input').attr('placeholder', 'Chọn ngành hàng')
         $('#group-id input').attr('data-id', '-1')
-        _product_function.POST('/Product/GroupProduct', { group_id: 56 }, function (result) {
+        _product_function.POST('/Product/GroupProduct', { group_id: 55 }, function (result) {
             if (result.is_success && result.data) {
                 $('#them-nganhhang .bg-box .row').html('')
                 var html = _product_constants.HTML.ProductDetail_GroupProduct_colmd4
@@ -675,7 +675,7 @@ var product_detail = {
                     html_item += _product_constants.HTML.ProductDetail_GroupProduct_colmd4_Li
                         .replaceAll('{id}', item.id).replaceAll('{name}', item.name)
                 })
-                html = html.replace('{li}', html_item).replaceAll('{name}', 'HuloToy').replaceAll('{level}', '0')
+                html = html.replace('{li}', html_item).replaceAll('{name}', 'HoanBds').replaceAll('{level}', '0')
                 $('#them-nganhhang .bg-box .row').html(html)
             }
         });
