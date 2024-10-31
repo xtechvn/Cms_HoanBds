@@ -190,7 +190,7 @@ namespace WEB.CMS.Controllers
                         strCategories = string.Join(",", model.Categories);
 
                     ClearCacheArticle(articleId, strCategories);
-                    _redisConn.DeleteCacheByKeyword(CacheName.ARTICLE_CATEGORY, 8);
+                    await _redisConn.DeleteCacheByKeyword(CacheName.ARTICLE_CATEGORY, 8);
 
                     // Tạo message để push vào queue
                     var j_param = new Dictionary<string, object>
@@ -256,7 +256,7 @@ namespace WEB.CMS.Controllers
                     //  clear cache article
                     var Categories = await _ArticleRepository.GetArticleCategoryIdList(Id);
                     ClearCacheArticle(Id, string.Join(",", Categories));
-                    _redisConn.DeleteCacheByKeyword(CacheName.ARTICLE_CATEGORY, 8);
+                    await _redisConn.DeleteCacheByKeyword(CacheName.ARTICLE_CATEGORY, 8);
 
                     // Tạo message để push vào queue
                     var j_param = new Dictionary<string, object>
@@ -309,7 +309,7 @@ namespace WEB.CMS.Controllers
                 {
                     //  clear cache article
                     ClearCacheArticle(Id, string.Join(",", Categories));
-                    _redisConn.DeleteCacheByKeyword(CacheName.ARTICLE_CATEGORY, 8);
+                    await _redisConn.DeleteCacheByKeyword(CacheName.ARTICLE_CATEGORY, 8);
                     // Tạo message để push vào queue
                     var j_param = new Dictionary<string, object>
                             {
