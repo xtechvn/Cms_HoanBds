@@ -87,7 +87,6 @@ namespace Caching.RedisWorker
             var db = _redis.GetDatabase(db_index);
             var server = _redis.GetServer(_redisHost, _redisPort);
             var keys = server.Keys(db_index, pattern: "*" + keyword + "*").ToList();
-            LogHelper.InsertLogTelegram("DeleteCacheByKeyword - RedisConn: " + keys.Count());
             foreach (var key in keys)
             {
                 
@@ -97,7 +96,6 @@ namespace Caching.RedisWorker
                 }
                 catch(Exception ex) 
                 {
-                    LogHelper.InsertLogTelegram("DeleteCacheByKeyword - RedisConn: " + ex);
                 }
             }
         }
