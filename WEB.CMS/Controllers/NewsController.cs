@@ -98,7 +98,7 @@ namespace WEB.CMS.Controllers
             }
             /*var NEWS_CATEGORY_ID = Convert.ToInt32(_configuration["Config:default_news_root_group"]);*/
             var NEWS_CATEGORY_ID = 55;
-            LogHelper.InsertLogTelegramByUrl(_configuration["BotSetting:bot_token"], _configuration["BotSetting:bot_group_id"], NEWS_CATEGORY_ID.ToString());
+/*            LogHelper.InsertLogTelegramByUrl(_configuration["BotSetting:bot_token"], _configuration["BotSetting:bot_group_id"], NEWS_CATEGORY_ID.ToString());*/
             ViewBag.StringTreeViewCate = await _GroupProductRepository.GetListTreeViewCheckBox(NEWS_CATEGORY_ID, -1, model.Categories);
             return View(model);
         }
@@ -192,7 +192,7 @@ namespace WEB.CMS.Controllers
                     // Tạo message để push vào queue
                     var j_param = new Dictionary<string, object>
                             {
-                                { "store_name", "Sp_GetAllArticle" },
+                                { "store_name", "SP_GetAllArticle" },
                                 { "index_es", "es_hoanbds_sp_get_article" },
                                 {"project_type", Convert.ToInt16(ProjectType.HOANBDS) },
                                 {"id" , model.Id }
