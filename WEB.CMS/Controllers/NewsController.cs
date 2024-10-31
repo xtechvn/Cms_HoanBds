@@ -1,4 +1,5 @@
 ﻿using Amazon.Runtime.Internal.Transform;
+using Caching.RedisWorker;
 using Entities.ViewModels;
 using Entities.ViewModels.News;
 using Microsoft.AspNetCore.Hosting;
@@ -36,8 +37,9 @@ namespace WEB.CMS.Controllers
         private readonly IWebHostEnvironment _WebHostEnvironment;
         private readonly IConfiguration _configuration;
         private readonly WorkQueueClient work_queue;
+        private readonly RedisConn _redisConn;
 
-        public NewsController(IConfiguration configuration, IArticleRepository articleRepository, IUserRepository userRepository, ICommonRepository commonRepository, IWebHostEnvironment hostEnvironment,
+        public NewsController(RedisConn redisConn,IConfiguration configuration, IArticleRepository articleRepository, IUserRepository userRepository, ICommonRepository commonRepository, IWebHostEnvironment hostEnvironment,
             IGroupProductRepository groupProductRepository)
         {
             _ArticleRepository = articleRepository;
@@ -47,7 +49,7 @@ namespace WEB.CMS.Controllers
             _configuration = configuration;
             _GroupProductRepository = groupProductRepository;
             work_queue = new WorkQueueClient(configuration);
-
+            _redisConn = redisConn;
 
         }
 
@@ -188,6 +190,7 @@ namespace WEB.CMS.Controllers
                         strCategories = string.Join(",", model.Categories);
 
                     ClearCacheArticle(articleId, strCategories);
+                    _redisConn.DeleteCacheByKeyword(CacheName.ARTICLE_CATEGORY, 8);
 
                     // Tạo message để push vào queue
                     var j_param = new Dictionary<string, object>
@@ -253,6 +256,7 @@ namespace WEB.CMS.Controllers
                     //  clear cache article
                     var Categories = await _ArticleRepository.GetArticleCategoryIdList(Id);
                     ClearCacheArticle(Id, string.Join(",", Categories));
+                    _redisConn.DeleteCacheByKeyword(CacheName.ARTICLE_CATEGORY, 8);
 
                     // Tạo message để push vào queue
                     var j_param = new Dictionary<string, object>
@@ -305,6 +309,7 @@ namespace WEB.CMS.Controllers
                 {
                     //  clear cache article
                     ClearCacheArticle(Id, string.Join(",", Categories));
+                    _redisConn.DeleteCacheByKeyword(CacheName.ARTICLE_CATEGORY, 8);
                     // Tạo message để push vào queue
                     var j_param = new Dictionary<string, object>
                             {
