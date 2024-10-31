@@ -3,6 +3,7 @@ using System;
 using StackExchange.Redis;
 using System.Threading.Tasks;
 using System.Linq;
+using Utilities;
 
 
 namespace Caching.RedisWorker
@@ -91,7 +92,10 @@ namespace Caching.RedisWorker
                 {
                     await db.KeyDeleteAsync(key);
                 }
-                catch { }
+                catch(Exception ex) 
+                {
+                    LogHelper.InsertLogTelegram("DeleteCacheByKeyword - RedisConn: " + ex);
+                }
             }
         }
     }
