@@ -1,9 +1,9 @@
 ﻿using Caching.RedisWorker;
 using Entities.Models;
 using Entities.ViewModels.Products;
-using hoanbds_Service.ElasticSearch.NewEs;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Repositories.IRepositories;
 using Utilities;
 using Utilities.Contants;
 using Utilities.Contants.ProductV2;
@@ -18,20 +18,22 @@ namespace WEB.CMS.Controllers
     {
         private readonly ProductDetailMongoAccess _productV2DetailMongoAccess;
         private readonly ProductSpecificationMongoAccess _productSpecificationMongoAccess;
-        private readonly GroupProductESService _groupProductESService;
+        private readonly IConfiguration _configuration;
+        private readonly IGroupProductRepository _groupProductRepository;
         private readonly RedisConn _redisConn;
         private StaticAPIService _staticAPIService;
-        private readonly int group_product_root = 1;
+        private readonly int group_product_root = 31;
         private readonly int db_index = 9;
-        public ProductController(IConfiguration configuration, RedisConn redisConn)
+        public ProductController(IConfiguration configuration, RedisConn redisConn, IGroupProductRepository groupProductRepository)
         {
             _productV2DetailMongoAccess = new ProductDetailMongoAccess(configuration);
-            _groupProductESService = new GroupProductESService(configuration["DataBaseConfig:Elastic:Host"], configuration);
             _productSpecificationMongoAccess = new ProductSpecificationMongoAccess(configuration);
             _staticAPIService = new StaticAPIService(configuration);
             _redisConn = redisConn;
             _redisConn.Connect();
+            _groupProductRepository = groupProductRepository;
             db_index = Convert.ToInt32(configuration["Redis:Database:db_search_result"]);
+            _configuration = configuration;
         }
         public IActionResult Index()
         {
@@ -39,7 +41,7 @@ namespace WEB.CMS.Controllers
             return View();
         }
 
-        public IActionResult Detail(string id = "")
+        public IActionResult Detail_old(string id = "")
         {
             ViewBag.ProductId = id;
             return View();
@@ -52,7 +54,7 @@ namespace WEB.CMS.Controllers
                     return Ok(new
                     {
                         is_success = true,
-                        data = _groupProductESService.GetListGroupProductByParentId(group_id),
+                        data = await _groupProductRepository.getCategoryByParentId(group_id),
                         position = position
 
                     });
@@ -123,8 +125,9 @@ namespace WEB.CMS.Controllers
                         var split_value = product.group_product_id.Split(",");
                         for (int i = 0; i < split_value.Length; i++)
                         {
-                            var group = _groupProductESService.GetDetailGroupProductById(Convert.ToInt64(split_value[i]));
-                            group_string += group.Name;
+                            var group = await _groupProductRepository.GetById(Convert.ToInt32(split_value[i]));
+                            if (group != null)
+                                group_string += group.Name;
                             if (i < (split_value.Length - 1)) group_string += " > ";
                         }
                     }
@@ -167,59 +170,6 @@ namespace WEB.CMS.Controllers
                 }
                 string rs = "";
                 var uploaded_image = new List<string>();
-                ////-- IMg
-                //if (request.images != null && request.images.Count > 0)
-                //{
-                //    foreach (var img in request.images)
-                //    {
-                //        if(img!=null && img.Trim() != "")
-                //        {
-                //            var data_img = _staticAPIService.GetImageSrcBase64Object(img);
-                //            if (data_img != null)
-                //            {
-                //                var url = await _staticAPIService.UploadImageBase64(data_img);
-                //                if (url != null && url.Trim() != "")
-                //                {
-                //                    uploaded_image.Add(url);
-                //                    continue;
-                //                }
-                //            }
-                //            uploaded_image.Add(img);
-
-                //        }
-
-                //    }
-                //}
-                //request.images = uploaded_image;
-                ////-- Avt:
-                //if (request.avatar != null && request.avatar.Trim() != "")
-                //{
-                //    if (request.avatar != null && request.avatar.Trim() != "" && request.avatar.Contains("data:image") && request.avatar.Contains("base64"))
-                //    {
-                //        var data_img = _staticAPIService.GetImageSrcBase64Object(request.avatar);
-                //        if (data_img != null)
-                //        {
-                //            request.avatar = await _staticAPIService.UploadImageBase64(data_img);
-                //        }
-
-                //    }
-                //}
-                ////-- Attributes Img:
-                //if (request.attributes_detail != null && request.attributes_detail.Count > 0)
-                //{
-                //    foreach (var attributes_detail in request.attributes_detail)
-                //    {
-                //        if (attributes_detail.img!=null && attributes_detail.img.Trim()!="" && attributes_detail.img.Contains("data:image") && attributes_detail.img.Contains("base64"))
-                //        {
-                //            var data_img = _staticAPIService.GetImageSrcBase64Object(attributes_detail.img);
-                //            if (data_img != null)
-                //            {
-                //                attributes_detail.img = await _staticAPIService.UploadImageBase64(data_img);
-                //            }
-
-                //        }
-                //    }
-                //}
 
                 //-- Add/Update product_main
                 var product_main = JsonConvert.DeserializeObject<ProductMongoDbModel>(JsonConvert.SerializeObject(request));
@@ -231,8 +181,9 @@ namespace WEB.CMS.Controllers
                     product_main.amount_max = amount_variations.OrderByDescending(x => x).First();
                     product_main.amount_min = amount_variations.OrderBy(x => x).First();
                     product_main.quanity_of_stock = request.variations.Sum(x => x.quanity_of_stock);
-                    product_main.updated_last = DateTime.Now;
-                   
+      
+                    
+
                 }
                 else
                 {
@@ -240,9 +191,10 @@ namespace WEB.CMS.Controllers
                     product_main.amount_min = null;
                 }
                 product_main.parent_product_id = "";
+                product_main.updated_last = DateTime.Now;
                 if (product_main._id == null || product_main._id.Trim() == "")
                 {
-                  
+
                     product_main.created_date = DateTime.Now;
                     msg = "Thêm mới sản phẩm thành công";
                     product_main.status = (int)ProductStatus.ACTIVE;
@@ -271,6 +223,8 @@ namespace WEB.CMS.Controllers
                         product_by_variations.amount = variation.amount;
                         product_by_variations.quanity_of_stock = variation.quanity_of_stock;
                         product_by_variations.sku = variation.sku;
+
+                        product_by_variations.updated_last = DateTime.Now;
                         if (variation._id != null && variation._id != "")
                         {
                             product_by_variations._id = variation._id;
@@ -294,17 +248,24 @@ namespace WEB.CMS.Controllers
                         data = rs
                     });
                 }
-
+                return Ok(new
+                {
+                    is_success = false,
+                    msg = "Thêm mới / Cập nhật sản phẩm thất bại, vui lòng liên hệ bộ phận IT",
+                    err=rs
+                });
             }
             catch (Exception ex)
             {
                 LogHelper.InsertLogTelegram("Summit - ProductController: " + ex.ToString());
+                return Ok(new
+                {
+                    is_success = false,
+                    msg = "Thêm mới / Cập nhật sản phẩm thất bại, vui lòng liên hệ bộ phận IT",
+                    err = ex.ToString(),
+                });
             }
-            return Ok(new
-            {
-                is_success = false,
-                msg = "Thêm mới / Cập nhật sản phẩm thất bại, vui lòng liên hệ bộ phận IT",
-            });
+           
         }
         public async Task<IActionResult> SummitImages(string data_image)
         {
@@ -388,7 +349,7 @@ namespace WEB.CMS.Controllers
                     {
                         try
                         {
-                            groups.Add(_groupProductESService.GetDetailGroupProductById(Convert.ToInt32(id)));
+                            groups.Add( await _groupProductRepository.GetById(Convert.ToInt32(id)));
                         }
                         catch { }
                     }
@@ -514,12 +475,12 @@ namespace WEB.CMS.Controllers
                 product.updated_last = DateTime.Now;
 
                 var rs = await _productV2DetailMongoAccess.AddNewAsync(product);
-                
+
                 if (rs != null)
                 {
-                    if(SubListing != null)
+                    if (SubListing != null)
                     {
-                        foreach(var item in SubListing)
+                        foreach (var item in SubListing)
                         {
                             item.parent_product_id = rs;
                             await _productV2DetailMongoAccess.AddNewAsync(item);
@@ -549,15 +510,15 @@ namespace WEB.CMS.Controllers
                 msg = "sao chép sản phẩm thất bại",
             });
         }
-        public async Task<IActionResult> UpdateProductStatus(string product_id,int status)
+        public async Task<IActionResult> UpdateProductStatus(string product_id, int status)
         {
             var msg = "Ẩn phẩm thành công";
             try
             {
                 var product = await _productV2DetailMongoAccess.GetByID(product_id);
                 product.updated_last = DateTime.Now;
-                product.status = status;          
-                var  rs = await _productV2DetailMongoAccess.UpdateAsync(product);
+                product.status = status;
+                var rs = await _productV2DetailMongoAccess.UpdateAsync(product);
                 if (rs != null)
                 {
                     await _redisConn.DeleteCacheByKeyword(CacheName.PRODUCT_LISTING, db_index);
@@ -566,7 +527,7 @@ namespace WEB.CMS.Controllers
                     {
                         is_success = true,
                         msg = msg,
-                      
+
                     });
                 }
 
@@ -585,6 +546,85 @@ namespace WEB.CMS.Controllers
                 is_success = false,
                 msg = "Ẩn sản phẩm thất bại",
             });
+        }
+
+        public async Task<IActionResult> Detail(string id = "")
+        {
+            ViewBag.Static = _configuration["API:StaticURL"];
+            if (id == null || id.Trim() == "")
+            {
+                ViewBag.GroupProduct = "";
+                ViewBag.Product = new ProductMongoDbModel();
+                ViewBag.SubProduct = new List<ProductMongoDbModel>();
+                ViewBag.ProductId = "";
+                return View();
+
+            }
+            var product = await _productV2DetailMongoAccess.GetByID(id);
+            if (product == null || product._id == null || product._id.Trim() == "")
+            {
+                ViewBag.GroupProduct = "";
+                ViewBag.Product = new ProductMongoDbModel();
+                ViewBag.SubProduct = new List<ProductMongoDbModel>();
+                ViewBag.ProductId = "";
+                return View();
+            }
+            var group_string = "";
+            if (product != null && product.group_product_id != null && product.group_product_id.Trim() != "")
+            {
+                try
+                {
+                    var split_value = product.group_product_id.Split(",");
+                    for (int i = 0; i < split_value.Length; i++)
+                    {
+                        var group = await _groupProductRepository.GetById(Convert.ToInt32(split_value[i]));
+                        group_string += group.Name;
+                        if (i < (split_value.Length - 1)) group_string += " > ";
+                    }
+                }
+                catch { }
+
+            }
+            ViewBag.GroupProduct = group_string;
+            ViewBag.Product = product;
+            ViewBag.SubProduct = await _productV2DetailMongoAccess.SubListing(id);
+            ViewBag.ProductId = id;
+
+            return View();
+        }
+        public async Task<IActionResult> AttributesPrice(
+            bool? is_one_weight, List<ProductAttributeMongoDbModel> attributes, List<ProductAttributeMongoDbModelItem> attributes_detail, List<ProductMongoDbModel> sub_product,
+            string product_id = "")
+        {
+            ViewBag.IsOneWeight = is_one_weight;
+            ViewBag.Attributes = attributes;
+            ViewBag.AttributesDetail = attributes_detail;
+            ViewBag.SubProduct = sub_product;
+            try
+            {
+                var subs = sub_product;
+                if (product_id != null && product_id.Trim() != "")
+                {
+                    var product = await _productV2DetailMongoAccess.GetByID(product_id);
+                    if (product != null && product._id != null)
+                    {
+                        ViewBag.Attributes = product.attributes;
+                        ViewBag.AttributesDetail = product.attributes_detail;
+                        subs.AddRange(await _productV2DetailMongoAccess.SubListing(product_id));
+
+                    }
+                }
+            }
+            catch
+            {
+
+            }
+            return View();
+        }
+        public IActionResult AttributeDetail(int item_index)
+        {
+            ViewBag.Index = item_index;
+            return View();
         }
     }
 
