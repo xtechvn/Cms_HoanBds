@@ -50,6 +50,7 @@ namespace WEB.CMS.Controllers
             _GroupProductRepository = groupProductRepository;
             work_queue = new WorkQueueClient(configuration);
             _redisConn = redisConn;
+            _redisConn.Connect();
 
         }
 
