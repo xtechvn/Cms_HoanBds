@@ -72,6 +72,7 @@ namespace WEB.CMS.Models.Product
         {
             try
             {
+                if (keyword == null) keyword = "";
                 var filter = Builders<ProductMongoDbModel>.Filter;
                 var filterDefinition = filter.Empty;
                 filterDefinition &= Builders<ProductMongoDbModel>.Filter.Regex(x => x.name, new Regex(keyword.ToLower().Trim(), RegexOptions.IgnoreCase));
