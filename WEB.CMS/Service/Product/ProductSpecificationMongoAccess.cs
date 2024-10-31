@@ -13,9 +13,9 @@ namespace WEB.CMS.Models.Product
         public ProductSpecificationMongoAccess(IConfiguration configuration)
         {
             _configuration = configuration;
-            string url = "mongodb://" + configuration["DataBaseConfig:MongoServer:Host"] + "";
-            var client = new MongoClient("mongodb://" + configuration["DataBaseConfig:MongoServer:Host"] + "");
-            IMongoDatabase db = client.GetDatabase(configuration["DataBaseConfig:MongoServer:catalog"]);
+            string url = "mongodb://" + _configuration["DataBaseConfig:MongoServer:user"] + ":" + _configuration["DataBaseConfig:MongoServer:pwd"] + "@" + _configuration["DataBaseConfig:MongoServer:Host"] + ":" + _configuration["DataBaseConfig:MongoServer:Port"] + "/" + _configuration["DataBaseConfig:MongoServer:catalog_core"];
+            var client = new MongoClient(url);
+            IMongoDatabase db = client.GetDatabase(_configuration["DataBaseConfig:MongoServer:catalog_core"]);
             _product_specification_collection = db.GetCollection<ProductSpecificationMongoDbModel>("ProductSpecification");
         }
         public async Task<string> AddNewAsync(ProductSpecificationMongoDbModel model)
