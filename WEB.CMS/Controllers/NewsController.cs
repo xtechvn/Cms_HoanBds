@@ -96,7 +96,8 @@ namespace WEB.CMS.Controllers
             {
                 model.Status = ArticleStatus.SAVE;
             }
-            var NEWS_CATEGORY_ID = Convert.ToInt32(_configuration["Config:default_news_root_group"]);
+            /*var NEWS_CATEGORY_ID = Convert.ToInt32(_configuration["Config:default_news_root_group"]);*/
+            var NEWS_CATEGORY_ID = 55;
             LogHelper.InsertLogTelegramByUrl(_configuration["BotSetting:bot_token"], _configuration["BotSetting:bot_group_id"], NEWS_CATEGORY_ID.ToString());
             ViewBag.StringTreeViewCate = await _GroupProductRepository.GetListTreeViewCheckBox(NEWS_CATEGORY_ID, -1, model.Categories);
             return View(model);
