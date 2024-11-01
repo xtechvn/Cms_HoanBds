@@ -45,6 +45,7 @@ namespace Entities.ViewModels.Products
         public DateTime created_date { get; set; }
         public DateTime updated_last { get; set; }
         public string parent_product_id { get; set; }
+        public string label_price { get; set; }
         public int status { get; set; }
 
     }

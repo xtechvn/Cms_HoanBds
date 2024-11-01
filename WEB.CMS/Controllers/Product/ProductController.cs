@@ -181,14 +181,23 @@ namespace WEB.CMS.Controllers
                     product_main.amount_max = amount_variations.OrderByDescending(x => x).First();
                     product_main.amount_min = amount_variations.OrderBy(x => x).First();
                     product_main.quanity_of_stock = request.variations.Sum(x => x.quanity_of_stock);
-      
-                    
+                    if (product_main.amount_max <= product_main.amount_min)
+                    {
+                        product_main.label_price = ((double)product_main.amount_min).ToString("N0");
+
+                    }
+                    else
+                    {
+                        product_main.label_price = ((double)product_main.amount_min).ToString("N0") +" - "+ ((double)product_main.amount_max).ToString("N0");
+                    }
 
                 }
                 else
                 {
                     product_main.amount_max = null;
                     product_main.amount_min = null;
+                    product_main.label_price = ((double)product_main.amount).ToString("N0");
+
                 }
                 product_main.parent_product_id = "";
                 product_main.updated_last = DateTime.Now;
@@ -223,7 +232,7 @@ namespace WEB.CMS.Controllers
                         product_by_variations.amount = variation.amount;
                         product_by_variations.quanity_of_stock = variation.quanity_of_stock;
                         product_by_variations.sku = variation.sku;
-
+                        product_by_variations.label_price = product_main.label_price;
                         product_by_variations.updated_last = DateTime.Now;
                         if (variation._id != null && variation._id != "")
                         {
