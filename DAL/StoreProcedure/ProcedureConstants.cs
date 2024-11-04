@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace DAL.StoreProcedure
@@ -38,6 +39,7 @@ namespace DAL.StoreProcedure
         public const string SP_GetListOrder = "SP_GetListOrder";
         public const string SP_GetListSupplier = "SP_GetListSupplier";
         public const string SP_InsertPolicy = "SP_InsertPolicy";
+        public const string sp_InsertUser = "sp_InsertUser";
         public const string SP_GetDepositHistoryByClientId = "SP_GetDepositHistoryByClientId";
         public const string SP_GetDetailOrderByClientId = "SP_GetDetailOrderByClientId";
         public const string Sp_CountTotalContractByStatus = "Sp_CountTotalContractByStatus";

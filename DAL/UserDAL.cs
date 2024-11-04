@@ -97,6 +97,38 @@ namespace DAL
             return null;
         }
 
+        public async Task<int> CreateUser(User user) 
+        {
+            try 
+            {
+                SqlParameter[] sqlParameter = new SqlParameter[] 
+                {
+                    new SqlParameter("@UserName",user.UserName != null ? user.UserName : DBNull.Value),
+                    new SqlParameter("@FullName",user.FullName != null ? user.FullName : DBNull.Value),
+                    new SqlParameter("@Password",user.Password != null ? user.Password : DBNull.Value),
+                    new SqlParameter("@Phone",user.Phone != null ? user.Phone : DBNull.Value),
+                    new SqlParameter("@ResetPassword",user.ResetPassword != null ? user.ResetPassword : DBNull.Value),
+                    new SqlParameter("@BirthDay",user.BirthDay != null ? user.BirthDay : DBNull.Value),
+                    new SqlParameter("@Gender",user.Gender != null ? user.Gender : DBNull.Value),
+                    new SqlParameter("@Email",user.Email != null ? user.Email : DBNull.Value),
+                    new SqlParameter("@Avata",user.Avata != null ? user.Avata : DBNull.Value),
+                    new SqlParameter("@Address",user.Address != null ? user.Address : DBNull.Value),
+                    new SqlParameter("@Status",user.Status != null ? user.Status : DBNull.Value),
+                    new SqlParameter("@Note",user.Note != null ? user.Note : DBNull.Value),
+                    new SqlParameter("@CreatedBy",user.CreatedBy != null ? user.CreatedBy : DBNull.Value),
+                    new SqlParameter("@CreatedOn",user.CreatedOn != null ? user.CreatedOn : DBNull.Value),
+                    new SqlParameter("@ModifiedBy",user.ModifiedBy != null ? user.ModifiedBy : DBNull.Value),
+                    new SqlParameter("@ModifiedOn",user.ModifiedOn != null ? user.ModifiedOn : DBNull.Value)
+                };
+                return _DbWorker.ExecuteNonQuery(ProcedureConstants.sp_InsertUser, sqlParameter);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.InsertLogTelegram("CreateUser - UserDAL: " + ex);
+                return -1;
+            }
+        }
+
         /// <summary>
         /// UpdateUserRole
         /// </summary>

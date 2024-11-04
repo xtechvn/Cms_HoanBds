@@ -208,7 +208,7 @@ namespace Repositories.Repositories
                     ModifiedBy = user_id,
                     UserPositionId = model.UserPositionId,
                     Level = model.Level,
-                    Id = model.Id,
+/*                    Id = model.Id,*/
                     Manager = model.Manager,
                     UserMapId = model.UserMapId,
                     //UserRole = model.UserRole
@@ -222,7 +222,7 @@ namespace Repositories.Repositories
                     return -1;
                 }
 
-                var userId = (int)await _UserDAL.CreateAsync(entity);
+                var userId = (int)await _UserDAL.CreateUser(entity);
 
                 if (!string.IsNullOrEmpty(model.RoleId))
                 {
